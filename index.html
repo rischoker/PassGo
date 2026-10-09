@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PassGO! — English A2 City Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/world.css">
+<link rel="stylesheet" href="css/intro.css">
+<link rel="stylesheet" href="css/passport.css">
+</head>
+<body class="intro-active">
+
+<!-- ======================================================
+     INTRO
+     leather passport → pages + animals → flash → Welcome (tap)
+     → choose your team → passport details → APPROVED
+     → (first visit) welcome video → into the city
+     ====================================================== -->
+<div class="intro" id="intro" aria-live="polite">
+  <div class="intro-aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <canvas class="intro-fx" id="introFx" aria-hidden="true"></canvas>
+  <div class="intro-vignette" aria-hidden="true"></div>
+
+  <!-- scene 1: the leather passport -->
+  <section class="scene scene-book is-active" id="sceneBook">
+    <div class="book-stage" id="bookStage">
+      <div class="book-rays" aria-hidden="true"></div>
+      <div class="book-halo" aria-hidden="true"></div>
+      <button class="book" id="book" aria-label="Open your explorer passport">
+        <span class="page page-base"><span class="page-deco"></span></span>
+        <span class="page leaf" style="--n:7"><span class="leaf-face"></span><span class="leaf-back"></span></span>
+        <span class="page leaf" style="--n:6"><span class="leaf-face"></span><span class="leaf-back"></span></span>
+        <span class="page leaf" style="--n:5"><span class="leaf-face"></span><span class="leaf-back"></span></span>
+        <span class="page leaf" style="--n:4"><span class="leaf-face"></span><span class="leaf-back"></span></span>
+        <span class="page leaf" style="--n:3"><span class="leaf-face"></span><span class="leaf-back"></span></span>
+        <span class="page leaf" style="--n:2"><span class="leaf-face"></span><span class="leaf-back"></span></span>
+        <span class="page leaf" style="--n:1"><span class="leaf-face"></span><span class="leaf-back"></span></span>
+        <span class="cover">
+          <span class="cover-front">
+            <span class="cover-stitch" aria-hidden="true"></span>
+            <span class="cover-corner tl" aria-hidden="true"></span><span class="cover-corner tr" aria-hidden="true"></span>
+            <span class="cover-corner bl" aria-hidden="true"></span><span class="cover-corner br" aria-hidden="true"></span>
+            <span class="cover-kicker">PassGO! City</span>
+            <span class="cover-emblem"><img src="assets/passgo-logo.webp" alt=""></span>
+            <span class="cover-title">Explorer Passport</span>
+            <span class="cover-sub">English A2 · City Adventure</span>
+            <span class="cover-chip" aria-hidden="true"></span>
+            <span class="cover-strap" aria-hidden="true"></span>
+          </span>
+          <span class="cover-inside"><span class="endpaper"></span></span>
+        </span>
+        <span class="book-light" aria-hidden="true"></span>
+        <span class="book-beam" aria-hidden="true"></span>
+      </button>
+    </div>
+    <p class="intro-hint" id="introHint">Tap the passport to open it ✨</p>
+  </section>
+
+  <!-- scene 2: welcome (stays until the student taps) -->
+  <section class="scene scene-welcome" id="sceneWelcome" aria-hidden="true">
+    <div class="welcome-art">
+      <span class="welcome-glow" aria-hidden="true"></span>
+      <img src="assets/welcome-explorer.webp" alt="Welcome, Explorer!" id="welcomeArt">
+    </div>
+    <p class="welcome-sub">A big city adventure is waiting for you!</p>
+    <button class="art-btn btn-gold btn-xl" id="welcomeGo"><span class="btn-ico">🪪</span>Open my passport</button>
+  </section>
+
+  <!-- scene 3: choose your team -->
+  <section class="scene scene-select" id="sceneSelect" aria-hidden="true">
+    <h2 class="select-title">Choose your explorer team!</h2>
+    <div class="teams" role="radiogroup" aria-label="Explorer team">
+      <button class="team-card" data-team="nico" role="radio" aria-checked="false">
+        <span class="team-glow" aria-hidden="true"></span>
+        <span class="team-stage">
+          <span class="team-kid" id="selKid_nico"></span>
+          <span class="team-bird" id="selBird_nico"></span>
+        </span>
+        <span class="team-plate"><b>Nico &amp; Luma</b><span class="team-motto">“Brave together!”</span></span>
+        <span class="team-check" aria-hidden="true">✓</span>
+      </button>
+      <button class="team-card" data-team="massie" role="radio" aria-checked="false">
+        <span class="team-glow" aria-hidden="true"></span>
+        <span class="team-stage">
+          <span class="team-kid" id="selKid_massie"></span>
+          <span class="team-bird" id="selBird_massie"></span>
+        </span>
+        <span class="team-plate"><b>Massie &amp; Luna</b><span class="team-motto">“More friends, more discoveries!”</span></span>
+        <span class="team-check" aria-hidden="true">✓</span>
+      </button>
+    </div>
+    <button class="art-btn btn-start btn-xl" id="teamGo" disabled><span class="btn-ico">🧭</span>This is my team!</button>
+  </section>
+
+  <!-- scene 4: passport details -->
+  <section class="scene scene-register" id="sceneRegister" aria-hidden="true">
+    <form class="pdoc" id="passportForm" autocomplete="off" novalidate>
+      <div class="pdoc-page pdoc-left">
+        <div class="pdoc-head">
+          <img src="assets/passgo-logo.webp" alt="" class="pdoc-logo">
+          <div>
+            <span class="pdoc-kicker">PassGO! City · Explorer Passport</span>
+            <h2 class="pdoc-title">Explorer details</h2>
+          </div>
+        </div>
+        <div class="pdoc-photo-row">
+          <div class="pdoc-photo"><span class="pdoc-kid" id="regKid"></span><span class="pdoc-bird" id="regBird"></span><span class="pdoc-photo-flag" id="regFlag">🧭</span></div>
+          <dl class="pdoc-meta">
+            <dt>Passport No.</dt><dd id="regNumber">PG-0000-000</dd>
+            <dt>Issued</dt><dd id="regIssued">—</dd>
+            <dt>Team</dt><dd id="regTeam">—</dd>
+            <dt>Level</dt><dd>English A2</dd>
+          </dl>
+        </div>
+        <div class="mrz" aria-hidden="true"><span id="mrz1"></span><span id="mrz2"></span></div>
+      </div>
+      <div class="pdoc-page pdoc-right">
+        <p class="pdoc-intro">Fill in your passport to enter the city.</p>
+        <label class="field">
+          <span class="field-label">Name</span>
+          <input type="text" id="regName" maxlength="24" placeholder="Your first name" required>
+          <span class="field-line"></span>
+        </label>
+        <label class="field">
+          <span class="field-label">Country</span>
+          <input type="text" id="regCountry" list="countryList" maxlength="40" placeholder="Where are you from?" required>
+          <span class="field-line"></span>
+          <datalist id="countryList"></datalist>
+        </label>
+        <div class="field field-age">
+          <span class="field-label" id="ageLabel">Age</span>
+          <div class="stepper" role="group" aria-labelledby="ageLabel">
+            <button type="button" class="step-btn" id="ageMinus" aria-label="Younger">−</button>
+            <input type="number" id="regAge" min="4" max="99" value="9" inputmode="numeric" aria-labelledby="ageLabel">
+            <button type="button" class="step-btn" id="agePlus" aria-label="Older">+</button>
+          </div>
+        </div>
+        <p class="form-error" id="regError" role="alert"></p>
+        <button type="submit" class="art-btn btn-gold btn-ready" id="readyBtn"><span class="btn-ico">🧭</span>I'm ready!</button>
+        <div class="approved-stamp" id="approvedStamp" aria-hidden="true">
+          <svg viewBox="0 0 260 150">
+            <g filter="url(#ink-rough)" fill="none" stroke="currentColor">
+              <rect x="8" y="8" width="244" height="134" rx="16" stroke-width="7"/>
+              <rect x="20" y="20" width="220" height="110" rx="9" stroke-width="2.5"/>
+              <text x="130" y="42" text-anchor="middle" fill="currentColor" stroke="none" font-size="13" font-weight="800" letter-spacing="3">★ PASSGO! CITY ★</text>
+              <text x="130" y="94" text-anchor="middle" fill="currentColor" stroke="none" font-size="46" font-weight="900" letter-spacing="3">APPROVED</text>
+              <text x="130" y="119" text-anchor="middle" fill="currentColor" stroke="none" font-size="12" font-weight="800" letter-spacing="2" id="stampDate">ENTRY GRANTED</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- scene 5: one-time welcome video -->
+  <section class="scene gate-panel" id="introGate" hidden>
+    <h2>🎬 Before you enter the city…</h2>
+    <p>Watch the welcome video to unlock your adventure.</p>
+    <div class="gate-video-wrap"><div id="gateYtPlayer"></div></div>
+    <button id="gateContinueBtn" class="art-btn btn-start gate-btn" disabled>Watch the whole video to continue</button>
+    <button id="gateSkipBtn" class="gate-skip">I've already seen it, continue →</button>
+  </section>
+
+  <div class="flash" id="flash" aria-hidden="true"></div>
+  <button class="intro-skip" id="introSkip">Skip ›</button>
+  <div class="light-burst" id="lightBurst" aria-hidden="true"></div>
+</div>
+
+<!-- shared SVG filter: rubber-stamp ink texture -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="ink-rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" result="rough"/>
+      <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="11" result="speck"/>
+      <feColorMatrix in="speck" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -4.5 3.35" result="holes"/>
+      <feComposite in="rough" in2="holes" operator="in"/>
+    </filter>
+  </defs>
+</svg>
+
+<div id="appRoot">
+
+<header class="topbar">
+  <a class="brand" href="#map" aria-label="PassGO! home">
+    <img src="assets/passgo-logo.webp" alt="PassGO!" class="brand-logo">
+    <span class="brand-tag">English A2 · City Adventure</span>
+  </a>
+  <nav class="topnav">
+    <a href="#map" class="active">🗺️ City map</a>
+    <a href="#passportCard">🪪 My passport</a>
+    <a href="#stampsPanel">🏅 My stamps</a>
+    <button class="nav-video" id="introVideoBtn">🎬 Welcome video</button>
+  </nav>
+</header>
+
+<main class="layout">
+
+  <!-- LEFT: welcome + explorer passport -->
+  <aside class="side side-left">
+    <div class="card intro-card">
+      <img src="assets/welcome-explorer.webp" alt="" class="welcome-banner">
+      <h1 class="sr-only">Welcome, Explorer!</h1>
+      <p>Complete the <b>6 units</b> of the city, collect every stamp and become an <strong>English A2 Master</strong>. Each unit you finish clears the clouds and opens a new part of the city!</p>
+      <a href="#map" class="art-btn btn-start" id="startBtn"><span class="btn-ico">🚀</span>Start the adventure!</a>
+    </div>
+
+    <article class="pcard tilt" id="passportCard" aria-label="Explorer passport">
+      <div class="pcard-holo" aria-hidden="true"></div>
+      <header class="pcard-head">
+        <img src="assets/passgo-logo.webp" alt="" class="pcard-logo">
+        <div><span class="pcard-kicker">Explorer Passport</span><span class="pcard-sub">PassGO! City · English A2</span></div>
+      </header>
+      <div class="pcard-body">
+        <div class="pcard-photo">
+          <span class="pcard-kid" id="pcKid"></span>
+          <span class="pcard-bird" id="pcBird"></span>
+          <span class="pcard-flag" id="pcFlag">🧭</span>
+        </div>
+        <dl class="pcard-fields">
+          <dt>Name</dt><dd id="pcName">Explorer</dd>
+          <dt>Country</dt><dd id="pcCountry">—</dd>
+          <dt>Age</dt><dd id="pcAge">—</dd>
+          <dt>Team</dt><dd id="pcTeam">—</dd>
+          <dt>Rank</dt><dd id="pcRank">Rookie Explorer</dd>
+        </dl>
+      </div>
+      <div class="pcard-mrz" id="pcMrz" aria-hidden="true"></div>
+      <div class="pcard-approved" aria-hidden="true">APPROVED</div>
+    </article>
+  </aside>
+
+  <!-- CENTRE: the city -->
+  <section class="map-wrap" id="map" aria-label="City map">
+    <div class="world" id="world">
+      <img class="world-map" src="assets/world/city-map.webp" alt="Illustrated map of PassGO! city" draggable="false">
+      <div class="sea-layer" aria-hidden="true"><div class="sea-shimmer"></div><div class="sea-glints"></div></div>
+      <div class="boat" id="boat" aria-hidden="true"><div class="boat-bob"><span class="boat-wake"></span><img src="assets/world/city-boat.png" alt="" draggable="false"></div></div>
+      <img class="pirate-flag" id="pirateFlag" src="assets/world/city-flag.png" alt="" aria-hidden="true" draggable="false">
+      <svg class="path-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path id="routeGlow" d="" />
+        <path id="routePath" d="" />
+      </svg>
+      <canvas class="fog" id="fogCanvas" aria-hidden="true"></canvas>
+      <div class="sky-clouds" aria-hidden="true"><span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span></div>
+      <div class="gulls" id="gulls" aria-hidden="true"></div>
+      <div class="nodes" id="nodesLayer"></div>
+      <div class="actor bird" id="bird"><div class="actor-sprite"></div><div class="bubble"></div></div>
+      <div class="actor explorer" id="explorer"><div class="actor-shadow"></div><div class="actor-sprite"></div><div class="bubble"></div></div>
+      <canvas class="fx" id="fxCanvas" aria-hidden="true"></canvas>
+    </div>
+  </section>
+
+  <!-- RIGHT: expedition log + stamps -->
+  <aside class="side side-right">
+    <section class="log" aria-labelledby="logTitle">
+      <header class="log-head"><h3 id="logTitle">Expedition Log</h3><span class="log-rank" id="logRank">Level 1</span></header>
+      <div class="log-top">
+        <div class="compass" id="compass" role="img" aria-label="Journey progress">
+          <svg viewBox="0 0 140 140">
+            <defs>
+              <linearGradient id="compassGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffe08a"/><stop offset=".5" stop-color="#f2a93b"/><stop offset="1" stop-color="#3fae6a"/>
+              </linearGradient>
+              <radialGradient id="compassFace" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#fff8e4"/><stop offset="1" stop-color="#ead6a6"/></radialGradient>
+            </defs>
+            <circle cx="70" cy="70" r="66" fill="#5b3a22"/>
+            <circle cx="70" cy="70" r="62" fill="url(#compassFace)" stroke="#d9a441" stroke-width="2"/>
+            <g class="compass-ticks" stroke="#8a6a44" stroke-linecap="round"></g>
+            <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(91,58,34,.14)" stroke-width="9"/>
+            <circle class="ring-fill" id="ringFill" cx="70" cy="70" r="52" fill="none" stroke="url(#compassGrad)" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 70 70)"/>
+            <g font-family="Baloo 2, sans-serif" font-weight="800" font-size="10" fill="#5b3a22" text-anchor="middle">
+              <text x="70" y="27">N</text><text x="116" y="74">E</text><text x="70" y="121">S</text><text x="24" y="74">W</text>
+            </g>
+            <g class="needle" id="needle">
+              <path d="M70 34 L76 70 L70 76 L64 70Z" fill="#c1443a"/>
+              <path d="M70 106 L76 70 L70 64 L64 70Z" fill="#3a4e5c"/>
+              <circle cx="70" cy="70" r="5" fill="#d9a441" stroke="#5b3a22" stroke-width="1.5"/>
+            </g>
+          </svg>
+          <div class="compass-pct"><b id="progressPct">0%</b><span>journey</span></div>
+        </div>
+        <div class="log-level">
+          <div class="level-shield"><img src="assets/shield.png" alt=""><b id="levelVal">1</b></div>
+          <div class="xp-track" aria-label="Experience to next level"><div class="xp-fill" id="xpFill"><i></i></div></div>
+          <span class="xp-caption" id="xpCaption">0 / 300 XP</span>
+        </div>
+      </div>
+      <div class="log-stats">
+        <div class="lstat"><img src="assets/star.png" alt=""><b id="xpVal">0</b><span>XP</span></div>
+        <div class="lstat"><img src="assets/coin.png" alt=""><b id="coinVal">0</b><span>Coins</span></div>
+        <div class="lstat"><span class="lstat-ico" aria-hidden="true">🏙️</span><b id="islandPct">0%</b><span>Explored</span></div>
+      </div>
+      <div class="progress-bar" hidden><div class="progress-fill" id="progressFill"></div></div>
+      <div class="next-card" id="nextCard"></div>
+    </section>
+
+    <section class="visa" id="stampsPanel" aria-labelledby="visaTitle">
+      <header class="visa-head">
+        <h2 id="visaTitle">City Stamps</h2>
+        <span class="visa-count"><b id="stampCount">0</b>/6</span>
+      </header>
+      <p class="visa-sub">Finish a unit to stamp your passport.</p>
+      <div class="stamp-grid" id="stampGrid"></div>
+    </section>
+  </aside>
+
+</main>
+
+<footer class="footer">
+  <span>Learn · Play · Practise · Explore</span>
+  <span class="footer-links">
+    <button id="replayIntroBtn" class="reset-link">Replay the intro</button>
+    <button id="resetBtn" class="reset-link">New explorer (reset)</button>
+  </span>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="missionModal" role="dialog" aria-modal="true"></div>
+</div>
+
+<div class="finale" id="finale" hidden>
+  <div class="finale-card">
+    <img src="assets/crown.png" alt="" class="finale-crown">
+    <h2>You are an English A2 Master!</h2>
+    <p>You explored the whole city and collected every stamp. Congratulations, explorer!</p>
+    <button class="art-btn btn-start" id="finaleClose">Keep exploring →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</div>
+
+<!-- sound control (always reachable) -->
+<div class="sound-ctrl" id="soundCtrl">
+  <button class="sound-btn" id="soundBtn" aria-label="Sound on/off" title="Sound on/off">
+    <svg viewBox="0 0 24 24" class="ico-on"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    <svg viewBox="0 0 24 24" class="ico-off"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5m0-5l-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="sound-panel">
+    <label for="volMaster">Volume</label>
+    <input type="range" id="volMaster" min="0" max="100" value="60">
+    <label for="volMusic">Music</label>
+    <input type="range" id="volMusic" min="0" max="100" value="60">
+  </div>
+  <span class="sound-hint" id="soundHint">Tap for sound</span>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="js/units-data.js"></script>
+<script src="js/world-data.js"></script>
+<script src="js/char-data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/world.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/passport.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

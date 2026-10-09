@@ -1,0 +1,234 @@
+/* ============================================================
+   PassGO! — passport card · mission stamps · expedition log · buttons
+   ============================================================ */
+
+/* ============================================================
+   GAME BUTTONS
+   ============================================================ */
+.art-btn {
+  --c1: #7fd35b; --c2: #3f9a36; --c3: #2d7a28; --edge: #1d5419;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.08rem; line-height: 1.15; letter-spacing: .3px;
+  color: #fff; text-decoration: none; text-align: center; cursor: pointer;
+  padding: 12px 22px 13px; border: 2px solid rgba(40,20,5,.35); border-radius: 16px;
+  border-image: none;
+  background: linear-gradient(180deg, var(--c1) 0%, var(--c2) 55%, var(--c3) 100%);
+  box-shadow: 0 6px 0 var(--edge), 0 12px 20px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.5), inset 0 -4px 0 rgba(0,0,0,.14);
+  text-shadow: 0 2px 0 rgba(0,0,0,.28);
+  transform: translateY(0); transition: transform .12s ease, box-shadow .12s ease, filter .2s;
+}
+.art-btn::before { /* glossy top */
+  content: ""; position: absolute; z-index: -1; left: 6%; right: 6%; top: 3px; height: 45%; border-radius: 12px 12px 40% 40%;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));
+}
+.art-btn::after { /* light sweep on hover */
+  content: ""; position: absolute; top: 0; bottom: 0; width: 38%; left: -60%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: skewX(-18deg); transition: left .7s ease;
+}
+.art-btn:hover { transform: translateY(-3px); filter: brightness(1.06) saturate(1.05);
+  box-shadow: 0 9px 0 var(--edge), 0 16px 26px rgba(0,0,0,.3), 0 0 0 4px rgba(255,226,140,.35), inset 0 2px 0 rgba(255,255,255,.5), inset 0 -4px 0 rgba(0,0,0,.14); }
+.art-btn:hover::after { left: 125%; }
+.art-btn:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--edge), 0 4px 8px rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.4); }
+.art-btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.art-btn:disabled, .art-btn[disabled] { --c1: #bdb7aa; --c2: #948e81; --c3: #7a7468; --edge: #5b564d; cursor: not-allowed; filter: none; transform: none; }
+.art-btn:disabled::after { display: none; }
+.btn-ico { display: inline-grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 50%; background: rgba(255,255,255,.22); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); text-shadow: none; font-size: .9em; }
+.btn-start    { --c1: #7fd35b; --c2: #3f9a36; --c3: #2d7a28; --edge: #1d5419; }
+.btn-video    { --c1: #5fe0ea; --c2: #1fa3b3; --c3: #157d8c; --edge: #0d5560; }
+.btn-complete { --c1: #ffc15e; --c2: #f08a24; --c3: #d06a12; --edge: #8f4507; }
+.btn-gold     { --c1: #fff0a8; --c2: #f5c542; --c3: #d99a1e; --edge: #8a5a0c; color: #4a2c0a; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+.btn-go       { --c1: #ff8a73; --c2: #e0503a; --c3: #c13a28; --edge: #7a1f14; padding: 8px 16px 9px; font-size: .95rem; border-radius: 13px; }
+.intro-btns .art-btn { width: 100%; font-size: 1rem; padding: 11px 12px 12px; }
+
+/* ============================================================
+   COLUMN
+   ============================================================ */
+
+
+/* shared security-paper background */
+.pcard, .visa {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cg fill='none' stroke-width='.7'%3E%3Cpath d='M0 30 Q15 5 30 30 T60 30 T90 30 T120 30' stroke='%2390c8b8' opacity='.5'/%3E%3Cpath d='M0 30 Q15 55 30 30 T60 30 T90 30 T120 30' stroke='%23e6a0b8' opacity='.4'/%3E%3Cpath d='M0 15 Q30 0 60 15 T120 15' stroke='%23d9b46a' opacity='.3'/%3E%3Cpath d='M0 45 Q30 60 60 45 T120 45' stroke='%23d9b46a' opacity='.3'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 30%, #fffaf0, #f3e7c8 75%);
+}
+
+/* ============================================================
+   PASSPORT HOLDER CARD (holographic, tilts in 3D)
+   ============================================================ */
+.pcard {
+  --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+  position: relative; overflow: hidden; border-radius: 18px; color: var(--ink);
+  border: 3px solid #173d21;
+  box-shadow: 0 0 0 3px #d9a441, 0 0 0 6px #173d21, 0 18px 34px rgba(0,0,0,.35);
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform .6s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  transform-style: preserve-3d;
+}
+.pcard.tilting { transition: transform .08s linear; }
+.pcard-holo {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none; mix-blend-mode: color-dodge; opacity: .28; transition: opacity .3s;
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.75), transparent 40%),
+    linear-gradient(115deg, transparent 20%, rgba(255,90,180,.45) 35%, rgba(90,220,255,.45) 45%, rgba(255,235,90,.45) 55%, rgba(120,255,160,.4) 65%, transparent 80%);
+  background-size: 100% 100%, 250% 250%;
+  background-position: 0 0, var(--mx) var(--my);
+  animation: holo-drift 7s ease-in-out infinite;
+}
+.pcard.tilting .pcard-holo { opacity: .6; animation: none; }
+@keyframes holo-drift { 0%, 100% { background-position: 0 0, 0% 30%; } 50% { background-position: 0 0, 100% 70%; } }
+.pcard-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: linear-gradient(135deg, #2f6b3c, #173d21); color: #f6d98a; }
+.pcard-logo { width: 54px; height: auto; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4)); }
+.pcard-kicker { display: block; font-family: var(--font-display); font-weight: 800; font-size: .92rem; white-space: nowrap; letter-spacing: 1.5px; text-transform: uppercase; line-height: 1;
+  background: linear-gradient(90deg, #d9a441, #fff1b8 45%, #d9a441 60%); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 250% 100%; animation: gold-sheen 4s linear infinite; }
+.pcard-sub { display: block; font-size: .68rem; letter-spacing: 1.2px; opacity: .85; margin-top: 3px; }
+@keyframes gold-sheen { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+.pcard-body { display: flex; gap: 14px; padding: 14px 14px 8px; position: relative; z-index: 1; }
+.pcard-photo { position: relative; flex: 0 0 34%; aspect-ratio: .78; border-radius: 10px; overflow: hidden; border: 2.5px solid var(--wood);
+  background: linear-gradient(180deg, #d8efe9, #fff8e6); display: flex; align-items: flex-end; justify-content: center; box-shadow: 0 3px 0 rgba(91,58,34,.25); }
+.pcard-photo img { width: 96%; height: auto; }
+.pcard-flag { position: absolute; top: 4px; right: 4px; font-size: 1.25rem; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+.pcard-fields { margin: 0; display: grid; grid-template-columns: 1fr; align-content: start; min-width: 0; }
+.pcard-fields dt { font-size: .58rem; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; opacity: .55; margin-top: 4px; }
+.pcard-fields dt:first-child { margin-top: 0; }
+.pcard-fields dd { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1rem; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#pcName { font-size: 1.25rem; color: #173d21; }
+.pcard-mrz { padding: 7px 12px 9px; display: flex; flex-direction: column; background: rgba(255,255,255,.55); border-top: 1px dashed rgba(91,58,34,.3);
+  font-family: "Space Mono", ui-monospace, "Courier New", monospace; font-weight: 700; font-size: .6rem; letter-spacing: 1px; white-space: nowrap; overflow: hidden; color: #3a2a16; }
+.pcard-approved { position: absolute; z-index: 2; left: 18px; bottom: 50px; padding: 2px 8px; border: 3px double #c8102e; border-radius: 6px;
+  color: #c8102e; font-family: var(--font-display); font-weight: 800; font-size: .9rem; letter-spacing: 2px; transform: rotate(-14deg); opacity: 0; mix-blend-mode: multiply;
+  filter: url(#ink-rough); }
+.pcard.approved .pcard-approved { opacity: .8; }
+
+/* ============================================================
+   MISSION STAMPS (visa page)
+   ============================================================ */
+.visa { position: relative; border-radius: 18px; padding: 18px 16px 16px; border: 3px solid var(--wood); box-shadow: 0 12px 24px rgba(0,0,0,.28), inset 0 0 0 2px rgba(217,164,65,.35); }
+.visa::before { /* stitched spine */
+  content: ""; position: absolute; left: 10px; top: 14px; bottom: 14px; border-left: 2px dashed rgba(91,58,34,.25);
+}
+.visa-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-left: 10px; }
+.visa-head h2 { margin: 0; font-size: 1.35rem; }
+.visa-count { font-family: var(--font-display); font-weight: 800; font-size: .95rem; background: #173d21; color: #f6d98a; padding: 2px 12px; border-radius: 20px; box-shadow: inset 0 0 0 2px #d9a441; }
+.visa-count b { font-size: 1.1rem; }
+.visa-sub { font-size: .8rem; margin: 4px 0 10px 10px; opacity: .8; }
+.stamp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 8px; padding: 6px 2px 2px 12px; }
+.stamp { position: relative; aspect-ratio: 1; display: grid; place-items: center; }
+.stamp-art { width: 100%; height: auto; transform: rotate(var(--rot)); mix-blend-mode: multiply; filter: saturate(1.1) contrast(1.05); transition: transform .35s cubic-bezier(.2,1.6,.4,1); }
+.stamp.done:hover .stamp-art { transform: rotate(0deg) scale(1.08); }
+.stamp-date { position: absolute; bottom: -4%; font-size: .52rem !important; left: 50%; transform: translateX(-50%) rotate(calc(var(--rot) * -.5)); white-space: nowrap;
+  font-family: "Space Mono", monospace; font-weight: 700; font-size: .62rem; letter-spacing: .5px; color: var(--ink);
+  background: #fbf3dc; border: 1.5px solid var(--ink); border-radius: 4px; padding: 0 5px; box-shadow: 0 1px 0 rgba(0,0,0,.15); }
+.stamp-ghost { width: 86%; aspect-ratio: 1; border-radius: 50%; border: 3px dashed rgba(91,58,34,.35); display: grid; place-items: center; align-content: center; gap: 2px;
+  color: rgba(91,58,34,.5); background: radial-gradient(circle, rgba(255,255,255,.4), transparent 70%); transition: border-color .2s, transform .2s; }
+.sg-emoji { font-size: 1.6rem; filter: grayscale(1); opacity: .45; }
+.sg-unit { font-family: var(--font-display); font-weight: 800; font-size: .66rem; letter-spacing: 1.5px; text-transform: uppercase; }
+.stamp:not(.done):hover .stamp-ghost { border-color: rgba(91,58,34,.6); transform: scale(1.04); }
+.stamp-tip {
+  position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, 6px); opacity: 0; pointer-events: none; z-index: 5;
+  background: #173d21; color: #f6d98a; font-family: var(--font-display); font-weight: 700; font-size: .75rem; white-space: nowrap;
+  padding: 3px 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.3); transition: opacity .2s, transform .2s;
+}
+.stamp:hover .stamp-tip { opacity: 1; transform: translate(-50%, 0); }
+.stamp.slam .stamp-art { animation: mstamp-slam .65s cubic-bezier(.5,0,.4,1.4) .2s both; }
+.stamp.slam::after { content: ""; position: absolute; inset: 8%; border-radius: 50%; border: 4px solid var(--ink); opacity: 0; animation: ink-ring .7s ease-out .55s; }
+@keyframes mstamp-slam { 0% { opacity: 0; transform: translateY(-40%) scale(2.6) rotate(-30deg); filter: blur(3px); } 55% { opacity: 1; transform: scale(.9) rotate(calc(var(--rot) + 2deg)); filter: none; } 75% { transform: scale(1.06) rotate(var(--rot)); } 100% { transform: rotate(var(--rot)); } }
+@keyframes ink-ring { 0% { opacity: .6; transform: scale(.8); } 100% { opacity: 0; transform: scale(1.5); } }
+
+/* ============================================================
+   EXPEDITION LOG (progress)
+   ============================================================ */
+.log {
+  position: relative; border-radius: 18px; padding: 16px; color: var(--parchment);
+  background:
+    repeating-linear-gradient(95deg, rgba(255,255,255,.035) 0 3px, transparent 3px 11px),
+    radial-gradient(ellipse at 30% 0%, #5e3d22, #3a2413 70%);
+  border: 3px solid #25160a;
+  box-shadow: 0 14px 28px rgba(0,0,0,.35), inset 0 0 0 2px rgba(217,164,65,.55), inset 0 2px 0 4px rgba(255,220,160,.06);
+}
+.log-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.log-head h3 { margin: 0; color: #f6d98a; font-size: 1.2rem; white-space: nowrap; text-shadow: 0 2px 0 rgba(0,0,0,.4); }
+.log-rank { font-size: .72rem; font-weight: 800; letter-spacing: .5px; color: #f3e5c0; opacity: .85; text-align: right; }
+.log-top { display: grid; grid-template-columns: 124px 1fr; gap: 14px; align-items: center; }
+.compass { position: relative; width: 124px; aspect-ratio: 1; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); }
+.compass svg { width: 100%; height: 100%; display: block; }
+.ring-fill { transition: stroke-dasharray 1.4s cubic-bezier(.3,.9,.2,1); }
+.needle { transform-origin: 70px 70px; transform-box: view-box; transition: transform 1.6s cubic-bezier(.3,1.6,.4,1); }
+.compass:hover .needle { animation: needle-wiggle .8s ease; }
+@keyframes needle-wiggle { 30% { rotate: 12deg; } 60% { rotate: -8deg; } }
+.compass-pct { position: absolute; left: 50%; bottom: 17%; transform: translateX(-50%); text-align: center; color: #3a2413; line-height: 1; pointer-events: none; }
+.compass-pct b { display: block; font-family: var(--font-display); font-size: 1rem; font-weight: 800; background: #fff8e4; border-radius: 8px; padding: 0 5px; box-shadow: 0 1px 0 rgba(0,0,0,.2); }
+.compass-pct span { font-size: .5rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; opacity: .7; }
+.log-level { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; gap: 6px 10px; align-items: center; }
+.level-shield { grid-row: 1 / span 2; position: relative; width: 52px; aspect-ratio: .9; display: grid; place-items: center; }
+.level-shield img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(0,0,0,.45)); }
+.level-shield b { position: relative; font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.5), 0 0 8px rgba(0,0,0,.4); margin-top: -4px; }
+.xp-track { position: relative; height: 16px; border-radius: 10px; background: rgba(0,0,0,.35); box-shadow: inset 0 2px 4px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.08); overflow: visible; }
+.xp-fill {
+  position: relative; height: 100%; width: 0%; border-radius: 10px;
+  background:
+    repeating-linear-gradient(115deg, rgba(255,255,255,.22) 0 8px, transparent 8px 16px),
+    linear-gradient(180deg, #ffe89a, #f2b333 60%, #d98f14);
+  background-size: 32px 100%, 100% 100%;
+  box-shadow: 0 0 10px rgba(255,200,80,.6), inset 0 1px 0 rgba(255,255,255,.6);
+  animation: xp-stripes 1.2s linear infinite;
+  transition: width 1.2s cubic-bezier(.3,.9,.2,1);
+}
+.xp-fill i { position: absolute; right: -6px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); border-radius: 50%;
+  background: radial-gradient(circle, #fff, #ffe08a 45%, rgba(255,200,80,0) 70%); animation: spark 1.2s ease-in-out infinite; }
+@keyframes xp-stripes { to { background-position: 32px 0, 0 0; } }
+@keyframes spark { 50% { transform: translateY(-50%) scale(1.5); opacity: .7; } }
+.xp-caption { grid-column: 2; font-size: .72rem; font-weight: 800; opacity: .85; }
+.log-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 12px; }
+.lstat { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 4px 6px; border-radius: 12px;
+  background: rgba(0,0,0,.25); box-shadow: inset 0 2px 6px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.07); }
+.lstat img, .lstat-ico { width: 28px; height: 28px; object-fit: contain; font-size: 1.4rem; line-height: 28px; text-align: center; filter: drop-shadow(0 2px 2px rgba(0,0,0,.45)); }
+.lstat b { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; line-height: 1.1; color: #fff3cf; }
+.lstat span:last-child { font-size: .6rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; opacity: .7; }
+.bump { display: inline-block; animation: stat-bump .45s cubic-bezier(.2,1.8,.4,1); }
+@keyframes stat-bump { 50% { transform: scale(1.35); color: #ffd35a; } }
+.next-card { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 12px; border-radius: 14px; color: var(--ink);
+  background: linear-gradient(180deg, #fff8e4, #f0dfb4); border: 2px dashed rgba(91,58,34,.45); box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+.next-emoji { flex: 0 0 auto; width: 42px; height: 42px; display: grid; place-items: center; font-size: 1.5rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3aa7c4, var(--ocean) 60%, var(--ocean-deep)); box-shadow: 0 0 0 3px #d9a441, 0 3px 0 3px rgba(0,0,0,.2); animation: current-bob 1.8s ease-in-out infinite; }
+.next-text { flex: 1; min-width: 0; line-height: 1.15; }
+.next-text small { display: block; font-size: .62rem; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; opacity: .6; }
+.next-text b { font-family: var(--font-display); font-size: .98rem; }
+
+/* scroll-driven reveal of the side cards (progressive enhancement) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .passport-col > *, .intro-col > * { animation: card-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+  }
+}
+@keyframes card-rise { from { opacity: 0; transform: translateY(40px) scale(.97); } }
+
+@media (max-width: 1080px) {
+  .passport-col { position: static; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+  .stamp-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 520px) {
+  .stamp-grid { grid-template-columns: repeat(2, 1fr); }
+  .log-top { grid-template-columns: 110px 1fr; }
+  .compass { width: 110px; }
+}
+
+/* ============================================================
+   PASSPORT CARD — the chosen team, animated
+   ============================================================ */
+.pcard-photo { flex: 0 0 42%; aspect-ratio: .82; position: relative; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 75%, #fff8e6, #d8efe9 70%); display: block; }
+.pcard[data-team="massie"] .pcard-photo { background: radial-gradient(ellipse at 50% 75%, #fff3f6, #f7d9e6 70%); }
+.pcard-kid { position: absolute; left: 0; bottom: -3%; height: 100%; }
+.pcard-bird { position: absolute; right: -10%; top: 0; height: 42%; }
+.pcard-flag { z-index: 2; }
+.pcard-fields dd { font-size: .95rem; }
+#pcName { font-size: 1.3rem; }
+.side-left .pcard { position: relative; }
+.visa, .log { padding: clamp(12px, 1.1vw, 18px); }
+.log-top { grid-template-columns: clamp(96px, 7vw, 130px) 1fr; }
+.compass { width: 100%; }
+.stamp-art { width: 90%; }
+.pcard-kicker { font-size: clamp(.72rem, .75vw, .95rem) !important; letter-spacing: 1px !important; }
+.pcard-approved { left: 10px !important; bottom: 54px !important; font-size: .78rem !important; }
