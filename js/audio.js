@@ -40,12 +40,17 @@ const PassAudio = (() => {
     if (!AC) return false;
     ctx = new AC();
     master = ctx.createGain();
+    // loudness chain: gentle glue compressor -> make-up gain -> brick-wall limiter
+    // (the synth voices are soft by design, so the whole mix is lifted here)
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -18; comp.ratio.value = 3;
-    master.connect(comp).connect(ctx.destination);
+    comp.threshold.value = -30; comp.knee.value = 12; comp.ratio.value = 4; comp.attack.value = 0.01; comp.release.value = 0.25;
+    const makeup = ctx.createGain(); makeup.gain.value = 3.2;
+    const limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -2; limiter.knee.value = 0; limiter.ratio.value = 20; limiter.attack.value = 0.002; limiter.release.value = 0.1;
+    master.connect(comp).connect(makeup).connect(limiter).connect(ctx.destination);
     musicBus = ctx.createGain(); ambBus = ctx.createGain(); sfxBus = ctx.createGain();
     musicBus.connect(master); ambBus.connect(master); sfxBus.connect(master);
-    sfxBus.gain.value = 0.9;
+    sfxBus.gain.value = 1.4;
     noiseBuf = makeNoise(2, false);
     brownBuf = makeNoise(6, true);
     applyVolume(true);
@@ -65,7 +70,7 @@ const PassAudio = (() => {
     const duckF = ducked ? 0.12 : 1;
     const musicOn = scene === "map" || scene === "create";
     musicBus.gain.setTargetAtTime((scene === "create" ? 0.7 : 0.55) * prefs.music * duckF * (voiceDuck ? 0.25 : 1) * (musicOn ? 1 : 0), t, 0.6);
-    ambBus.gain.setTargetAtTime((ducked ? 0.25 : 1) * (scene === "none" ? 0 : (scene === "intro" || scene === "create") ? 0.4 : 1), t, 0.6);
+    ambBus.gain.setTargetAtTime(0.4 * (ducked ? 0.25 : 1) * (scene === "none" ? 0 : (scene === "intro" || scene === "create") ? 0.4 : 1), t, 0.6);
   }
 
   // ---------- small synth helpers ----------

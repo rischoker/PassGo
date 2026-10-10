@@ -2,6 +2,9 @@
 // UNITS — PassGO! English A2 · City Adventure  (edit links here)
 // Each unit has a list of resources. A resource can be:
 //   { kind:"video",  title, youtube:"VIDEO_ID" }      -> YouTube player in the window
+//   { kind:"video",  title, youtube:"ID", letterbox:true }
+//        -> for Shorts recorded as a 16:9 video inside a vertical frame (black bars
+//           above and below): the player shows only the picture, without the bars
 //   { kind:"video",  title, youtube:null }            -> "Coming soon" card
 //   { kind:"link",   title, url, label, note }        -> big button, opens in a new tab
 // kind also chooses the icon: activity · game · quiz · reading · app · test
@@ -16,7 +19,7 @@ const UNITS = [
     goal: "Check in, ask for a room and talk about what a hotel has.",
     words: ["🛏️ room", "🔑 key", "🛎️ reception", "🧳 suitcase", "🏊 swimming pool", "📝 check in"],
     resources: [
-      { kind: "video", title: "Watch & learn", youtube: null },
+      { kind: "video", title: "Watch & learn", youtube: "yiRvfK_NMDw", letterbox: true },
       { kind: "activity", title: "Hotel activity", label: "Open the activity", url: "https://view.genially.com/6a4d299efafec6adb3abe06d" },
       { kind: "game", title: "Hotel game", label: "Play on Kahoot!", url: "https://kahoot.it/solo/06900128?challenge-id=eb977722-9b6d-4d2e-acf5-c49ac5628d78_1783445455310" }
     ],
@@ -27,7 +30,7 @@ const UNITS = [
     goal: "Read a menu, order food and drinks, and ask for the bill.",
     words: ["📋 menu", "🧑‍🍳 waiter", "🍝 main course", "🥤 drink", "🍰 dessert", "🧾 the bill"],
     resources: [
-      { kind: "video", title: "Watch & learn", youtube: null },
+      { kind: "video", title: "Watch & learn", youtube: "ZZxJ1qHfTDc", letterbox: true },
       { kind: "activity", title: "Restaurant vocabulary", label: "Open the activity", url: "https://www.educaplay.com/learning-resources/17721248-restaurant_vocabulary.html" },
       { kind: "game", title: "Role-play at the restaurant", label: "Play on Wordwall", url: "https://wordwall.net/es/resource/28673073/role-play-at-the-restaurant" }
     ],
@@ -49,7 +52,7 @@ const UNITS = [
     goal: "Buy things, ask prices and talk about clothes and sizes.",
     words: ["👕 T-shirt", "👟 shoes", "💲 How much is it?", "📏 size", "🏷️ cheap", "💎 expensive"],
     resources: [
-      { kind: "video", title: "Watch & learn", youtube: null },
+      { kind: "video", title: "Watch & learn", youtube: "sb3kjI7KFUs", letterbox: true },
       { kind: "activity", title: "Shopping vocabulary adventure", label: "Open the activity", url: "https://www.educaplay.com/learning-resources/29859101-shopping_vocabulary_adventure.html" },
       { kind: "quiz", title: "Shopping quiz", label: "Answer the quiz", url: "https://docs.google.com/forms/d/e/1FAIpQLSd_g96momOpjFLgqdaV7Mcec6FwhVlXYHFbTiD8bwVPaUMCaA/viewform" }
     ],

@@ -125,9 +125,86 @@ function resourceCard(r, i) {
 }
 const overlay = document.getElementById("modalOverlay");
 const modalEl = document.getElementById("missionModal");
+// ---------- unit video: cropped player for letterboxed Shorts ----------
+// The unit Shorts are 16:9 footage inside a 9:16 frame (black bars above and below).
+// We show a 16:9 window and enlarge the vertical player so only the picture band is
+// visible; our own controls replace YouTube's (which would sit in the hidden bars).
+let vp = null;
+function videoStage(r) {
+  if (!r || !r.youtube) {
+    return `<div class="vstage vsoon"><span class="vsoon-ico">🎬</span><b>Video coming soon!</b><span>Start with the activities on the right.</span></div>`;
+  }
+  return `<div class="vstage ${r.letterbox ? "letterbox" : ""}" id="vstage">
+      <div class="vp-crop"><div id="vpFrame"></div></div>
+      <button class="vp-big" id="vpBig" aria-label="Play video"><span>▶</span></button>
+      <div class="vp-bar">
+        <button class="vp-btn" id="vpPlay" aria-label="Play or pause">▶</button>
+        <div class="vp-track" id="vpTrack"><div class="vp-fill" id="vpFill"></div></div>
+        <span class="vp-time" id="vpTime">0:00</span>
+        <button class="vp-btn" id="vpMute" aria-label="Mute">🔊</button>
+        <button class="vp-btn" id="vpFull" aria-label="Full screen">⛶</button>
+      </div>
+    </div>`;
+}
+function mountVideo(r) {
+  const stage = document.getElementById("vstage"); if (!stage) return;
+  const fmt = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+  const state = { player: null, timer: null, playing: false };
+  const set = playing => { state.playing = playing; stage.classList.toggle("playing", playing); document.getElementById("vpPlay").textContent = playing ? "❚❚" : "▶"; };
+  if (window.YT && YT.Player) {
+    state.player = new YT.Player("vpFrame", {
+      videoId: r.youtube,
+      playerVars: { controls: r.letterbox ? 0 : 1, rel: 0, playsinline: 1, modestbranding: 1, fs: 0, iv_load_policy: 3, disablekb: 1 },
+      events: {
+        onReady: () => stage.classList.add("ready"),
+        onStateChange: e => {
+          if (e.data === YT.PlayerState.PLAYING) set(true);
+          if (e.data === YT.PlayerState.PAUSED) set(false);
+          if (e.data === YT.PlayerState.ENDED) { set(false); stage.classList.add("ended"); PassAudio.sfx("sparkle"); }
+        }
+      }
+    });
+    const p = () => state.player;
+    const toggle = () => { if (!p() || !p().getPlayerState) return; stage.classList.remove("ended"); state.playing ? p().pauseVideo() : p().playVideo(); };
+    document.getElementById("vpBig").addEventListener("click", toggle);
+    document.getElementById("vpPlay").addEventListener("click", toggle);
+    stage.querySelector(".vp-crop").addEventListener("click", toggle);
+    document.getElementById("vpMute").addEventListener("click", e => {
+      if (!p().isMuted) return; if (p().isMuted()) { p().unMute(); e.target.textContent = "🔊"; } else { p().mute(); e.target.textContent = "🔇"; }
+    });
+    document.getElementById("vpTrack").addEventListener("click", e => {
+      const rr = e.currentTarget.getBoundingClientRect(), d = p().getDuration ? p().getDuration() : 0;
+      if (d) p().seekTo((e.clientX - rr.left) / rr.width * d, true);
+    });
+    state.timer = setInterval(() => {
+      if (!p() || !p().getDuration) return;
+      const d = p().getDuration() || 0, t = p().getCurrentTime() || 0;
+      document.getElementById("vpFill").style.width = d ? (t / d * 100) + "%" : "0";
+      document.getElementById("vpTime").textContent = `${fmt(t)} / ${fmt(d)}`;
+    }, 250);
+  } else {
+    // YouTube API unavailable: plain embed (still cropped), YouTube's own click-to-play
+    stage.classList.add("ready", "no-api");
+    document.getElementById("vpFrame").outerHTML = `<iframe src="https://www.youtube.com/embed/${r.youtube}?rel=0&playsinline=1&modestbranding=1" title="Unit video" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  }
+  document.getElementById("vpFull").addEventListener("click", () => {
+    if (document.fullscreenElement) document.exitFullscreen(); else if (stage.requestFullscreen) stage.requestFullscreen();
+  });
+  vp = state;
+}
+function unmountVideo() {
+  if (!vp) return;
+  clearInterval(vp.timer);
+  try { vp.player && vp.player.destroy && vp.player.destroy(); } catch (e) {}
+  vp = null;
+}
+
 function openUnit(u) {
   const done = isComplete(u.id);
+  const video = u.resources.find(r => r.kind === "video");
+  const others = u.resources.filter(r => r.kind !== "video");
   modalEl.style.setProperty("--ink", u.color);
+  modalEl.classList.add("unit-modal");
   modalEl.innerHTML = `
     <button class="modal-close" aria-label="Close">✕</button>
     <header class="unit-head">
@@ -138,20 +215,30 @@ function openUnit(u) {
         <p class="unit-goal">${esc(u.goal)}</p>
       </div>
     </header>
-    <section class="unit-words"><h3>🗝️ Key words</h3><div class="vocab-chips">${u.words.map(w => `<span class="chip">${esc(w)}</span>`).join("")}</div></section>
-    <div class="res-list">${u.resources.map(resourceCard).join("")}</div>
-    <section class="reward"><img src="assets/star.png" alt=""><p>Finish this unit to earn the <b>${esc(u.badge)}</b> stamp and <b>+${u.xp} XP</b></p></section>
-    ${done ? `<div class="already-done">✓ Unit completed — great job!</div>`
-           : `<button class="art-btn btn-complete btn-xl" id="completeBtn"><span class="btn-ico">🏅</span>I've finished! Stamp my passport</button>`}`;
+    <div class="unit-grid">
+      <div class="unit-main">
+        <h3 class="col-title"><span>1</span> Watch &amp; learn</h3>
+        ${videoStage(video)}
+        <section class="unit-words"><h3>🗝️ Key words</h3><div class="vocab-chips">${u.words.map(w => `<span class="chip">${esc(w)}</span>`).join("")}</div></section>
+      </div>
+      <div class="unit-side">
+        <h3 class="col-title"><span>2</span> Practise &amp; play</h3>
+        <div class="res-list">${others.map(resourceCard).join("")}</div>
+        <section class="reward"><img src="assets/star.png" alt=""><p>Earn the <b>${esc(u.badge)}</b> stamp and <b>+${u.xp} XP</b></p></section>
+        ${done ? `<div class="already-done">✓ Unit completed — great job!</div>`
+               : `<button class="art-btn btn-complete btn-xl" id="completeBtn"><span class="btn-ico">🏅</span>I've finished!</button>`}
+      </div>
+    </div>`;
   modalEl.querySelector(".modal-close").addEventListener("click", closeModal);
-  modalEl.querySelectorAll(".res-link").forEach(a => a.addEventListener("click", () => PassAudio.sfx("click")));
+  modalEl.querySelectorAll(".res-link").forEach(a => a.addEventListener("click", () => { PassAudio.sfx("click"); if (vp && vp.player && vp.player.pauseVideo) vp.player.pauseVideo(); }));
   if (!done) modalEl.querySelector("#completeBtn").addEventListener("click", () => completeUnit(u));
   openOverlay();
+  mountVideo(video);
 }
 function openOverlay() { overlay.classList.add("open"); PassAudio.duck(true); }
 function closeModal() {
   if (!overlay.classList.contains("open")) return;
-  overlay.classList.remove("open"); modalEl.innerHTML = ""; PassAudio.duck(false);
+  unmountVideo(); overlay.classList.remove("open"); modalEl.innerHTML = ""; modalEl.classList.remove("unit-modal"); PassAudio.duck(false);
 }
 overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
