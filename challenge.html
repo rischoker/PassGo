@@ -234,6 +234,12 @@ button { font-family: inherit; cursor: pointer; border: 0; }
 .board-panel td { padding: .42rem .4rem; border-top: 1px solid #22313c; }
 .board-panel tr:nth-child(even) td { background: #16222c; }
 .board-panel .st-late { color: #ff7043; } .board-panel .st-boarding { color: #69f0ae; }
+/* narrow / portrait screens: the board sits between the question and the answers */
+.board-panel.inline { left: 50%; right: auto; transform: translateX(-50%); width: min(40rem, 94vw); padding: .5rem .8rem .6rem; animation: none; }
+.board-panel.inline .bd-title { font-size: 1.05rem; margin-bottom: .2rem; }
+.board-panel.inline table { font-size: clamp(.8rem, 3.4vw, 1.05rem); }
+.board-panel.inline th { font-size: .7rem; padding: .1rem .3rem; }
+.board-panel.inline td { padding: .28rem .3rem; }
 
 /* ---------- task screen (order · pay · directions) ---------- */
 .t-head { position: absolute; top: 4.9rem; left: 50%; transform: translateX(-50%); width: min(66rem, 94vw); padding: .8rem 1.3rem; display: flex; align-items: center; gap: 1rem; animation: drop .55s cubic-bezier(.2,1.5,.4,1) both; }
@@ -319,7 +325,7 @@ body.chat-mode #buddy, body.results-mode #buddy { display: none; }
 }
 @media (max-width: 700px) {
   .hud-title b { font-size: 1rem; } .hud-title small { display: none; } .coin-pill { min-width: 0; font-size: 1rem; }
-  .answers { grid-template-columns: 1fr; gap: .6rem; } .t-text { font-size: 1.25rem; } .board-panel { display: none !important; } .tile { min-height: 4rem; font-size: 1.3rem; }
+  .answers { grid-template-columns: 1fr; gap: .6rem; } .t-text { font-size: 1.25rem; } .tile { min-height: 4rem; font-size: 1.3rem; }
   .q-text { font-size: 1.5rem; } .stage-cards { grid-template-columns: 1fr; } .sign { font-size: 2.2rem; }
   #buddy { height: 20vh; }
 }
@@ -2178,16 +2184,24 @@ function measureRegion(id = currentScreen) {
   const H = innerHeight, W = innerWidth, pad = 12, hud = bottomOf($("#hud"));
   const buddy = $("#buddy"), bw = buddy.classList.contains("show") ? buddy.offsetLeft + buddy.offsetWidth : 0;
   if (id === "quiz") {
-    const bp = $("#boardPanel"), right = bp.classList.contains("show") ? W - bp.offsetLeft + pad : Math.min(bw, W * 0.18) * 0.3;
-    return { top: bottomOf($(".q-top")) + pad, bottom: H - $("#answers").offsetTop + pad, left: Math.min(bw, W * 0.18), right };
+    const bp = $("#boardPanel"), shown = bp.classList.contains("show"), inline = shown && bp.classList.contains("inline");
+    const right = shown && !inline ? W - bp.offsetLeft + pad : Math.min(bw, W * 0.18) * 0.3;
+    return { top: (inline ? bottomOf(bp) : bottomOf($(".q-top"))) + pad, bottom: H - $("#answers").offsetTop + pad, left: Math.min(bw, W * 0.18), right };
   }
   if (id === "match") return { top: bottomOf($(".m-head")) + pad + 34, bottom: H - $("#tray").offsetTop + pad, left: Math.min(bw, W * 0.16), right: 0 };
   if (id === "task") return { top: bottomOf($("#tHead")) + pad + 20, bottom: H - $("#tDock").offsetTop + pad, left: Math.min(bw, W * 0.16), right: 0 };
   if (id === "chat") { const c = $(".chat-wrap"); return c.offsetWidth > W * 0.7 ? { top: hud + pad, bottom: H - c.offsetTop + pad } : { top: hud + pad, left: c.offsetLeft + c.offsetWidth + pad, bottom: pad, right: pad }; }
   return { top: id ? hud : 0 };
 }
-function fitRegion(refit = true) { World.setRegion(measureRegion(), refit); }
+function fitRegion(refit = true) { placeBoard(); World.setRegion(measureRegion(), refit); }
 addEventListener("resize", () => requestAnimationFrame(() => fitRegion()));
+// departures board: at the side on wide screens, between question and answers on phones / portrait
+function placeBoard() {
+  const bp = $("#boardPanel"); if (!bp.classList.contains("show")) return;
+  const narrow = innerWidth < 900 || innerWidth < innerHeight * 1.15;
+  bp.classList.toggle("inline", narrow);
+  bp.style.top = narrow ? (bottomOf($(".q-top")) + 8) + "px" : "";
+}
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("show", s.id === id));
   document.body.classList.toggle("chat-mode", id === "chat");
@@ -2470,8 +2484,7 @@ RUN.order = async m => {
         Sound.sfx("correct"); revealText(); cheer($("#bServe")); Buddy.say("Yummy! 😋");
         stop(); dock.querySelector("#bServe").disabled = true;
         o.items.forEach(k => World.bounce(k));
-        setTimeout(() => Voice.say("Thank you!", o.voice), 400);
-        await sleep(2200); World.clearMarks(); finish();
+        await sleep(400); await sayAsync("Thank you!", o.voice); await sleep(900); World.clearMarks(); finish();
       } else {
         Sound.sfx("wrong"); Buddy.say(tries === 1 ? "Not quite! Listen again 👂" : "Look at the words!");
         const tray = dock.querySelector(".tray-box"); tray.classList.remove("shake"); void tray.offsetWidth; tray.classList.add("shake");
@@ -2523,9 +2536,8 @@ RUN.pay = async m => {
       if (s === it.price) {
         if (tries === 1) { good(); const r = $("#bPay").getBoundingClientRect(); addPoints(500, r.left + r.width / 2, r.top); } else miss(`“${it.say}”`, fmtMoney(it.price));
         Sound.sfx("correct"); revealText(); cheer($("#bPay")); Buddy.say("Perfect! 💰"); npc.wave(1.4);
-        setTimeout(() => Voice.say("Thank you! Here you are.", it.voice), 300);
         dock.querySelectorAll("button").forEach(b => b.disabled = true);
-        await sleep(2200); finish();
+        await sleep(300); await sayAsync("Thank you! Here you are.", it.voice); await sleep(700); finish();
       } else {
         Sound.sfx("wrong"); Buddy.say(s > it.price ? "That's too much! 🤔" : "That's not enough! 🤔");
         const pb = dock.querySelector(".pay-box"); pb.classList.remove("shake"); void pb.offsetWidth; pb.classList.add("shake");
@@ -2567,8 +2579,7 @@ RUN.directions = async m => {
     const s = World.screenOf(r.key);
     if (ok && s) { addPoints(500, s.x, s.y - 30); FX.confetti(70, s.x, s.y, 0.7); Buddy.play("cheer", false); }
     $("#tDock").innerHTML = `<div class="dir-hint ok">📍 This is the ${esc(nameOf(r.key))}!</div>`;
-    Voice.say(`This is the ${nameOf(r.key)}.`);
-    await sleep(2400); World.setFocus(null);
+    await sayAsync(`This is the ${nameOf(r.key)}.`); await sleep(900); World.setFocus(null);
   }
   WX.resetPin && WX.resetPin(false);
 };
@@ -2588,6 +2599,10 @@ RUN.chat = async m => {
   await sleep(600); npc.wave(2); Sound.sfx("ding");
   await sleep(1400);
 };
+// speak and wait until the line is finished (with a safety timeout), so the next voice never cuts it
+function sayAsync(text, role) {
+  return new Promise(res => { let done = false; const fin = () => { if (!done) { done = true; res(); } }; Voice.say(text, role, fin); setTimeout(fin, 1600 + text.length * 85); });
+}
 function addMsg(who, html, m) {
   const log = $("#chatLog"), d = document.createElement("div");
   d.className = `msg ${who === "me" ? "me" : ""}`;
@@ -2618,9 +2633,9 @@ async function chatTurn(turn, m, npc) {
     if (ok) { choice.classList.add("right"); good(); Sound.sfx("correct"); const r = choice.getBoundingClientRect(); addPoints(400, r.right - 60, r.top); }
     else { choice.classList.add("wrong"); act.querySelectorAll(".opt").forEach(b => b.dataset.o === right && b.classList.add("right")); Sound.sfx("wrong"); miss(fill(turn.say), right); }
     await sleep(ok ? 900 : 1700);
-    addMsg("me", esc(right), m); Voice.say(right, "kid");
+    addMsg("me", esc(right), m); act.innerHTML = "";
     if (ok) npc.cheer(0.8);
-    act.innerHTML = ""; await sleep(1100);
+    await sayAsync(right, "kid"); await sleep(450);
   } else {
     const target = fill(turn.build).split(" ");
     const sentence = target.join(" ").replace(/ \?/g, "?").replace(/ \./g, ".").replace(/ !/g, "!");
@@ -2645,8 +2660,8 @@ async function chatTurn(turn, m, npc) {
       await sleep(900); slots.innerHTML = target.map(w => `<span class="wtile" style="--i:0;background:#d6f5dd">${esc(w)}</span>`).join("");
     }
     await sleep(ok ? 900 : 1800);
-    addMsg("me", esc(sentence), m); Voice.say(sentence, "kid");
-    act.innerHTML = ""; await sleep(1100);
+    addMsg("me", esc(sentence), m); act.innerHTML = "";
+    await sayAsync(sentence, "kid"); await sleep(450);
   }
 }
 
